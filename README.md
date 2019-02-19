@@ -1,8 +1,3 @@
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ## Introduction
 
 R can quickly and easily combine multiple sheets from multiple Excel files into a single data frame. Here's a `tidyverse` and `readxl` driven custom function that returns a data frame with columns for file and sheet names for each file.
@@ -32,7 +27,7 @@ You can check that this matches alll the files you're expecting with:
 
 Next we can define the custom function that will read the individual Excel files. The two function inputs will be the path to the files, which was defined earlier with `dir_path` and then the individual file name itself. The function will read the individual file using `excel_sheets()`, get the individual sheet names with `set_names()`, and then import the data from each sheet using `read_xlsx()` and `map_df()`. `mutate()` is used to define the file name and then `select()` rearranges the columns so that the file name and sheet names are the first two columns and `everything()` includes the rest of the columns without having to name them specifically: 
 
-```{r message = FALSE, results='hide'}
+```
 read_sheets <- function(dir_path, file){
   xlsx_file <- paste0(dir_path, file)
   xlsx_file %>%
