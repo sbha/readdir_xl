@@ -39,14 +39,14 @@ read_sheets <- function(dir_path, file){
 }
 ```
 
-With the custom function defined, we can then use it to combine the individual files into a single data frame. We'll again use the `map_df()` function from the `purrr` package:
+With the custom function defined, we can then use it to combine the individual files into a single data frame. We'll again use the `map_df()` function from the `purrr` package from the `tidyverse`:
 
 ```
 df_xl <- list.files(dir_path, re_file) %>% 
   map_df(~ read_sheets(dir_path, .))
 ```
 
-Just like when we checked to make sure that we were reading from the correct directory and the correct file names, we'll use `list.files()` to get all the individual file names. Then using `map_df()` we'll apply our `read_sheets()` custom function to each Excel file in that directory and combine them into a single data frame:  
+Just like when we checked to make sure that we were reading from the correct directory and the correct file names, we'll use `list.files()` to get all the individual file names we're interested in importing. Then using `map_df()` we'll apply our `read_sheets()` custom function to read each Excel file in that directory and combine them into a single data frame:  
 
 ``` 
 # A tibble: 15 x 5
@@ -72,7 +72,7 @@ Just like when we checked to make sure that we were reading from the correct dir
 In this example, not every file has the same sheets or columns. File `test2.xlsx` has only one sheet, and `Sheet1` in `test3.xlsx` has only the first two columns.  
 
 
-The custom function defined above can be modified to handle additional specific needs. For example, the column names can reformated so that they are always in a consistent format. In this case, everything is converted to lower case and spaces are replaced with underscores:
+The custom function defined above can be modified to handle additional specific needs. For example, the column names can be reformated so that they are always in a consistent format. In this case, everything is converted to lower case and spaces are replaced with underscores using the `rename_all()` function:
 
 ```
 read_sheets <- function(dir_path, file){
@@ -129,4 +129,4 @@ df_xl <- list.files(dir_path, re_file) %>%
 
 ### Summary
 
-Using functions from the `tidyverse` and `readxl` packages we can define a custom function that can combine multiple Excel files into a single data frame. We can modifiy that custom function further to handle more specific needs of the data. 
+Using functions from the `tidyverse` and `readxl` packages we can define a custom function that can combine multiple Excel files into a single data frame. We can modifiy that custom function further to handle more specific needs for formatting and combining the data. 
