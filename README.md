@@ -1,6 +1,6 @@
 ## Introduction
 
-R can quickly and easily combine multiple sheets from multiple Excel files into a single data frame. Here's a `tidyverse` and `readxl` driven custom function that returns a data frame with columns for file and sheet names for each file.
+R can quickly and easily combine multiple sheets from multiple Excel files into a single data frame. Here's a `tidyverse` and `readxl` driven custom function that returns a data frame with columns for file and sheet names from each file.
 
 
 ## Usage
@@ -46,7 +46,7 @@ df_xl <- list.files(dir_path, re_file) %>%
   map_df(~ read_sheets(dir_path, .))
 ```
 
-Just like when we checked to make sure that we were reading from the correct directory and the correct file names, we'll use `list.files()` to get all the individual file names. Then using `map_df()` we'll apply our `read_sheets()` function to each Excel file in that directory and combine them into a single data frame:  
+Just like when we checked to make sure that we were reading from the correct directory and the correct file names, we'll use `list.files()` to get all the individual file names. Then using `map_df()` we'll apply our `read_sheets()` custom function to each Excel file in that directory and combine them into a single data frame:  
 
 ``` 
 # A tibble: 15 x 5
@@ -72,7 +72,7 @@ Just like when we checked to make sure that we were reading from the correct dir
 In this example, not every file has the same sheets or columns. File `test2.xlsx` has only one sheet, and `Sheet1` in `test3.xlsx` has only the first two columns.  
 
 
-This custom function defined above can be modified to handle specific needs. For example, the column names can converted to lower case and spaces replaces with underscores:
+The custom function defined above can be modified to handle additional specific needs. For example, the column names can reformated so that they are always in a consistent format. In this case, everything is converted to lower case and spaces are replaced with underscores:
 
 ```
 read_sheets <- function(dir_path, file){
@@ -100,13 +100,13 @@ read_sheets <- function(dir_path, file){
     mutate(file_name = file) %>% 
     select(file_name, sheet_name, everything()) %>% 
     rename_all(~tolower(.)) %>% 
-    rename_all(~str_replace_all(., '\\s+', '_'))
+    rename_all(~str_replace_all(., '\\s+', '_')) %>%
     filter(a > 1) %>% 
     mutate(a_plus_b = a + b)
 }
 ```
 
-In this case, we're removing any rows where column a is 1 or less and then creating a new column that adds columns a and b:
+In this case, we're removing any rows where column `a` is 1 or less and then creating a new column that adds columns `a` and `b`:
 
 ```
 df_xl <- list.files(dir_path, re_file) %>% 
