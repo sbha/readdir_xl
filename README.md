@@ -1,6 +1,3 @@
----
-output: html_document
----
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -15,7 +12,7 @@ R can quickly and easily combine multiple sheets from multiple Excel files into 
 
 Import the packages:
 
-```{r message = FALSE, results='hide'}
+```
 library(tidyverse)
 library(readxl)
 ```
