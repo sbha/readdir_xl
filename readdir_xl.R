@@ -9,7 +9,7 @@ read_sheets <- function(dir_path, file){
   xlsx_file %>%
     excel_sheets() %>%
     set_names() %>%
-    map_df(read_excel, path = xlsx_file, .id = 'sheet_name') %>% 
+    map_df(read_xlsx, path = xlsx_file, .id = 'sheet_name') %>% 
     mutate(file_name = file) %>% 
     select(file_name, sheet_name, everything())
 }
