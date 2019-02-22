@@ -41,15 +41,14 @@ read_sheets <- function(dir_path, file){
 }
 ```
 
-With the custom function defined, we can now use it to aggregate all the sheets from all the individual files matching the regular expession in the directory into a single data frame. We'll again use the `map_df()`:
+With the custom function defined, we can now use it to aggregate all the sheets from all the individual files matching the regular expession in the directory into a single data frame:
 
 ```
 df_xl <- list.files(dir_path, re_file) %>% 
-  map_df(~ read_sheets(dir_path, .))
+  map_df(~read_sheets(dir_path, .))
 ```
 
-Just like when we checked to make sure that we were reading from the correct directory and the correct file names, we'll use `list.files()` to get all the individual file names we're interested in importing. These will be used as the file name argument along side the `dir_path` in the custom function. Then using `map_df()` we'll apply the `read_sheets()` custom function to read each Excel file in that directory and combine them into a single data frame:  
-
+Just like when we checked to make sure that we were reading from the correct directory and the expected file names, we'll use `list.files()` to get all the individual file names we're interested in importing. The resulting file names will be used as the file name argument along side `dir_path` in the custom function. Using `map_df()` we'll apply the `read_sheets()` custom function to each file name returned by `list.files()` and combine them into a single data frame:  
 
 ``` 
 > df_xl
@@ -68,7 +67,7 @@ Just like when we checked to make sure that we were reading from the correct dir
 10 sample_2019-01-09.xlsx Sheet1     b           2       2       8      NA
 ```
 
-To get a better sense of everything in the data frame, we can use `count()` to see the number of observations by file and sheet names:
+To get a better sense of everything in the data frame, we can use `count()` to see the number of observations by file and sheet name:
 
 ```
 > df_xl %>% count(file_name, sheet_name)
@@ -85,9 +84,9 @@ To get a better sense of everything in the data frame, we can use `count()` to s
 8 sample_2019-02-02.xlsx Sheet3         2
 ```
 
-In this example, not every file has the same sheets or columns. The files need not have exactly the same format; only `sample_2019-01-15.xlsx` has `Col 4`, and `sample_2019-01-09.xlsx` has only two sheets. 
+In this example, not every file has the same sheets or columns. The files need not have exactly the same structure; only `sample_2019-01-15.xlsx` has `Col 4`, and `sample_2019-01-09.xlsx` has only two sheets. 
 
-This custom function aggregates every file, but we can improve the output by modifying the function to handle the specific needs of the data. For our example, the column names can be reformated so that they are always in a consistent `R` friendly format. In the modified function below, everything is converted to lower case and spaces are replaced with a single underscore using the `rename_all()` and `str_replace_all()` functions:
+This custom function aggregates every file, but we can improve the output by extending the function to handle the specific needs of the data. For our example, the column names can be reformated so that they are always in a consistent `R` friendly format. In the modified function below, everything is converted to lower case and spaces are replaced with a single underscore using the `rename_all()` and `str_replace_all()` functions:
 
 ```
 read_sheets <- function(dir_path, file){
@@ -122,7 +121,7 @@ read_sheets <- function(dir_path, file){
 }
 ```
 
-In this case, we're removing any rows where column `cat` is `b`, removing column `col_3`, and then creating a new column that adds columns `col_1` and `col_2`. Running the same Excel files through the updated custom function gives us a different data frame:
+In this expanding function, we're removing any rows where column `cat` equals `b`, removing column `col_3`, and then creating a new column that adds columns `col_1` and `col_2`. Running the same Excel files through the updated custom function gives us a different data frame, more specific to our needs:
 
 ```
 df_xl <- list.files(dir_path, re_file) %>% 
@@ -145,7 +144,9 @@ df_xl <- list.files(dir_path, re_file) %>%
 # ... with 38 more rows
 ```
 
-Finally, if there are many files in the directory and we only need a specific smaller subset, we can be a bit more selective with the files we import. Our sample files have a date in the name and we can use that to read only files from a given month or before a given date. To get only those select files, we can create a data frame from the file names that match our naming structure, extract the date from the file name and then filter to the month we need:
+These modifications with this example might seem trivial and something that can be done seperatly after the data has been aggregrated, which they can, of course, but they quickly become useful when dealing with a large number of files that might put near a machine's memory limits. 
+
+Finally, if there are many files in the directory and we only want a specific smaller subset, we can be a bit more selective with the files we import. In our example, the sample files have a date in the name and we can use that to read only files from a given month or before a given date. To get only those select files, we can create a data frame from the file names that match our naming structure and the `list.files()` function, extract the date from the file name and then filter to the month we need:
 
 ```
 df_dir <- data_frame(file = list.files(dir_path, re_file)) %>% 
@@ -154,11 +155,11 @@ df_dir <- data_frame(file = list.files(dir_path, re_file)) %>%
   filter(year_mon == '2019-01') 
 ```  
 
-We would then read the files using:
+In this case, we're only interested in files from January 2019. We would then read the files using:
 
 ```
 df_xl <- df_dir$file %>% 
-  map_df(~ read_sheets(dir_path, .))
+  map_df(~read_sheets(dir_path, .))
 ```
   
 
@@ -166,4 +167,4 @@ df_xl <- df_dir$file %>%
 
 ### Summary
 
-Using functions from the `tidyverse` and `readxl` packages we can define a custom function that can combine multiple Excel files into a single data frame. We can modifiy that custom function further to handle more specific needs for formatting, reorganizing, and combining the data. 
+Using functions from the `tidyverse` and `readxl` packages we can define a custom function that can combine multiple Excel files into a single data frame. We can modifiy and extend that custom function further to handle more specific needs for formatting, reorganizing, and combining the data. 
