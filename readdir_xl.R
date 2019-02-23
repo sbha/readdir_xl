@@ -63,3 +63,14 @@ df_xl <- df_dir$file %>%
   map_df(~ read_sheets(dir_path, .))
 
 
+
+# similar function for csv files
+read_csv_files <- function(dir_path, file){
+  read_csv(paste0(dir_path, file)) %>% 
+    mutate(file_name = file) %>% 
+    select(file_name, everything())
+}
+
+df_csv <- list.files(dir_path, '\\.csv') %>% 
+  map_df(~ read_csv_files(dir_path, .))
+
