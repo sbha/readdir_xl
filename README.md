@@ -2,6 +2,7 @@
 
 R can quickly and easily aggregrate data from multiple sheets from multiple Excel workbooks into a single data frame. A custom function combining functions from the `tidyverse` and `readxl` packages provides a template that can be adapted and expanded to handle many different data specific needs. 
 
+This exercise is also done using [Python's Pandas](https://github.com/sbha/readdir_xl.py).
 
 ## Usage
 
