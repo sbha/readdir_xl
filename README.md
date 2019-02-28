@@ -8,7 +8,7 @@ This exercise is also done using [Python's Pandas](https://github.com/sbha/readd
 
 Import the packages that have the functions that do all the heavy lifting:
 
-```
+```r
 #install.packages(tidyverse)
 #install.packages(readxl)
 library(tidyverse)
@@ -30,7 +30,7 @@ This regular expression will match file names that begin with `sample_`, a date 
 
 Next we can write the custom function that will read the individual Excel files and combine the different sheets within each workbook into a single data frame. The two function inputs will be the path to the files, which was defined earlier with `dir_path` and then the individual file name itself. The function will read the individual file using `excel_sheets()`, get the individual sheet names with `set_names()` and set them as a variable called `sheet_name`, and then import the data from each sheet using `read_xlsx()` and `map_df()`. `mutate()` is used to set the file name as a variable so that we know which file the data comes from, and then `select()` rearranges the columns so that the file name and sheet names are the first two columns and `everything()` includes the remaining of the columns without having to name them specifically: 
 
-```
+```r
 read_sheets <- function(dir_path, file){
   xlsx_file <- paste0(dir_path, file)
   xlsx_file %>%
@@ -44,14 +44,14 @@ read_sheets <- function(dir_path, file){
 
 With the custom function defined, we can now use it to aggregate all the sheets from all the individual files matching the regular expession in the directory into a single data frame:
 
-```
+```r
 df_xl <- list.files(dir_path, re_file) %>% 
   map_df(~read_sheets(dir_path, .))
 ```
 
 Just like when we checked to make sure that we were reading from the correct directory and the expected file names, we'll use `list.files()` to get the names for all the individual file names we're interested in importing. The resulting file names will be used as the file name argument along side `dir_path` in the custom function. Using `map_df()` we'll apply the `read_sheets()` custom function to each file name returned by `list.files()` and combine them into a single data frame:  
 
-``` 
+```r
 > df_xl
 # A tibble: 88 x 7
    file_name              sheet_name cat   `Col 1` `Col 2` `Col 3` `Col 4`
@@ -70,7 +70,7 @@ Just like when we checked to make sure that we were reading from the correct dir
 
 To get a better sense of everything in the data frame, we can use `count()` to see the number of observations by file and sheet name:
 
-```
+```r
 > df_xl %>% count(file_name, sheet_name)
 # A tibble: 8 x 3
   file_name              sheet_name     n
@@ -89,7 +89,7 @@ In this example, not every file has the same sheets or columns. The files need n
 
 This custom function aggregates every file, but we can improve the output by extending the function to handle more specific needs of this data. For our example, the column names can be reformatted so that they are always in a more `R` friendly format. In the modified function below, all column names are converted to lower case and spaces are replaced with a single underscore using the `rename_all()` and `str_replace_all()` functions:
 
-```
+```r
 read_sheets <- function(dir_path, file){
   xlsx_file <- paste0(dir_path, file)
   xlsx_file %>%
@@ -105,7 +105,7 @@ read_sheets <- function(dir_path, file){
 
 Going further, if the original Excel files contains data you don't need, you could remove it using `filter()` or by negating specific columns with `select()`. Or a column could be created using `mutate()` with something like the following:
 
-```
+```r
 read_sheets <- function(dir_path, file){
   xlsx_file <- paste0(dir_path, file)
   xlsx_file %>%
@@ -124,7 +124,7 @@ read_sheets <- function(dir_path, file){
 
 In this expanding function, we're removing any rows where column `cat` equals `b`, dropping column `col_3`, and then creating a new column that adds columns `col_1` and `col_2`. Running the same Excel files through the updated custom function gives us a different data frame, more specific to our needs:
 
-```
+```r
 df_xl <- list.files(dir_path, re_file) %>% 
   map_df(~ read_sheets(dir_path, .))
   
@@ -149,7 +149,7 @@ The modifications with this example might seem trivial and something that can be
 
 If there are many files in the directory and we only want a specific smaller subset, we can be a bit more selective with the files we import. In our example, the sample files have a date in the name and we can use that to read only files from a given month or before a given date. To get only those select files, we can create a data frame from the file names that match our naming structure and the `list.files()` function, extract the date from the file name with `str_extract()` and then filter to the month we need:
 
-```
+```r
 df_dir <- data_frame(file = list.files(dir_path, re_file)) %>% 
   mutate(date = as.Date(str_extract(file, '[0-9]{4}-[0-9]{2}-[0-9]{2}'))) %>% 
   mutate(year_mon = format(date, '%Y-%m')) %>% 
@@ -158,7 +158,7 @@ df_dir <- data_frame(file = list.files(dir_path, re_file)) %>%
 
 In this example, we can say we're only interested in files from January 2019. We would then read the files using:
 
-```
+```r
 df_xl <- df_dir$file %>% 
   map_df(~read_sheets(dir_path, .))
 ```
@@ -167,7 +167,7 @@ df_xl <- df_dir$file %>%
 
 Finally, if the files aren't `.xlsx`, a similar method can be used for `.csv` or other delimited files using functions from the `readr` package:
 
-```
+```r
 read_csv_files <- function(dir_path, file){
   read_csv(paste0(dir_path, file)) %>% 
     mutate(file_name = file) %>% 
