@@ -17,7 +17,7 @@ library(readxl)
 
 Define the target directory as a variable. This is the path to the directory where the Excel files are stored:
 
-`dir_path <- "~/path/to/test_dir/"`  
+`dir_path <- "/path/to/test_dir/"`  
 
 
 In this example all the Excel files we're interested in have the same naming convention, so we can use a regular expression to ensure we're reading only the files we need. This is useful if there are files in the same directory that we don't want to read. In this case the files are named `sample_2019-01-09.xlsx`, `sample_2019-01-15.xlsx` and so on, but we could simply use `xlsx` if we knew we needed every Excel file, or leave that arguement empty if we knew the directory contained only Excel files. The regular expression can be defined as a variable:
@@ -174,6 +174,26 @@ df_csv <- list.files(dir_path, '\\.csv') %>%
   map_df(~ read_csv_files(dir_path, .))
 ```
 
+Or also using `data.table::fread()` and some base R functions:
+
+```r
+library(data.table)
+
+fread_dir <- function(path, file){
+  dt <- fread(paste(dir_path, file, sep = '/'), fill = TRUE, na.strings = c("",NA))
+  
+  setnames(dt, names(dt), tolower(names(dt)))
+  setnames(dt, names(dt), gsub('\\.', '_', names(dt)))
+  
+  dt[, file_name:=file] 
+  
+  setcolorder(dt, c("file_name"))
+}
+
+test_files <- list.files(dir_path, 'test\\d+\\.csv')
+dt_csv <- rbindlist(lapply(test_files, function(x) fread_dir(x, path = dir_path)), fill = TRUE)
+
+```
 
 
 
